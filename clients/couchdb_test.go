@@ -1,8 +1,6 @@
 package clients_test
 
 import (
-	"bytes"
-	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -47,11 +45,6 @@ func Test_Create_Document(t *testing.T) {
 
 	_ = couchClient.CreateTable(tableName)
 
-	encodedDocument, err := json.Marshal(document1)
-	require.NoError(t, err)
-	require.NoError(t, couchClient.AddDocument(tableName, bytes.NewReader(encodedDocument)))
-
-	encodedDocument, err = json.Marshal(document2)
-	require.NoError(t, err)
-	require.NoError(t, couchClient.AddDocument(tableName, bytes.NewReader(encodedDocument)))
+	require.NoError(t, couchClient.AddDocument(tableName, document1))
+	require.NoError(t, couchClient.AddDocument(tableName, document2))
 }

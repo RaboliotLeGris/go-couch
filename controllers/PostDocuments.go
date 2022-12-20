@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"math/rand"
@@ -38,13 +37,8 @@ func (d PostDocuments) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	for _, document := range documents.Items {
 		dbDocument := dbmodels.DocumentFromAPI(document)
-		encodedDocument, err := json.Marshal(dbDocument)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Post Documents - Unable to marshal document - %s", err), http.StatusInternalServerError)
-			return
-		}
 
-		if err = d.CouchDBClient.AddDocument(tableName, bytes.NewReader(encodedDocument)); err != nil {
+		if err := d.CouchDBClient.AddDocument(tableName, dbDocument); err != nil {
 			http.Error(w, fmt.Sprintf("Post Documents - Unable to create the document - %s", err), http.StatusInternalServerError)
 			return
 		}

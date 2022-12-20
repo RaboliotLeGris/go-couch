@@ -1,12 +1,14 @@
 package clients
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 
+	"github.com/RaboliotLeGris/go-couch/dbmodels"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -60,13 +62,18 @@ func (c CouchDBClient) CreateTable(table string) error {
 	return nil
 }
 
-func (c CouchDBClient) AddDocument(table string, data io.Reader) error {
+func (c CouchDBClient) AddDocument(table string, document dbmodels.Document) error {
 	client := &http.Client{}
 
 	requestURI := fmt.Sprintf("%s/%s", c.addr, table)
 	log.Info("AddDocument - Request URI: ", requestURI)
 
-	req, err := http.NewRequest(http.MethodPost, requestURI, data)
+	encodedDocument, err := json.Marshal(document)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, requestURI, bytes.NewReader(encodedDocument))
 	if err != nil {
 		return err
 	}
