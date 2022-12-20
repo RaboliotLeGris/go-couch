@@ -1,15 +1,17 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
 
-	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/RaboliotLeGris/go-couch/apimodels"
 	"github.com/RaboliotLeGris/go-couch/clients"
+	"github.com/RaboliotLeGris/go-couch/dbmodels"
 )
 
 type PostDocuments struct {
@@ -26,10 +28,34 @@ func (d PostDocuments) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Debug("List of documents received", documents)
-	tableName := uuid.New().String()
+
+	tableName := generateTableName()
 
 	if err := d.CouchDBClient.CreateTable(tableName); err != nil {
 		http.Error(w, fmt.Sprintf("Post Documents - Error while CreateTable - %s", err), http.StatusInternalServerError)
 		return
 	}
+
+	for _, document := range documents.Items {
+		dbDocument := dbmodels.DocumentFromAPI(document)
+		encodedDocument, err := json.Marshal(dbDocument)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Post Documents - Unable to marshal document - %s", err), http.StatusInternalServerError)
+			return
+		}
+
+		if err = d.CouchDBClient.AddDocument(tableName, bytes.NewReader(encodedDocument)); err != nil {
+			http.Error(w, fmt.Sprintf("Post Documents - Unable to create the document - %s", err), http.StatusInternalServerError)
+			return
+		}
+	}
+}
+
+func generateTableName() string {
+	const letterBytes = "abcdefghijklmnopqrstuvwxyz"
+	b := make([]byte, 32)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+	return string(b)
 }

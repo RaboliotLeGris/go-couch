@@ -3,8 +3,10 @@ package controllers_test
 import (
 	"bytes"
 	"encoding/json"
+	"math/rand"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -26,6 +28,7 @@ func Test_PostDocuments_With_Empty_Body(t *testing.T) {
 }
 
 func Test_PostDocuments(t *testing.T) {
+	rand.Seed(time.Now().UnixNano())
 	couchClient := clients.NewCouchDBClient("http://127.0.0.1:5984", "admin", "password")
 
 	giveDocuments := apimodels.Documents{

@@ -1,6 +1,9 @@
 package main
 
 import (
+	"math/rand"
+	"time"
+
 	log "github.com/sirupsen/logrus"
 
 	"github.com/RaboliotLeGris/go-couch/clients"
@@ -9,6 +12,9 @@ import (
 
 func main() {
 	log.Info("Starting http server")
+
+	// Seed random with time
+	rand.Seed(time.Now().UnixNano())
 
 	port := 7777
 	couchAddr := "http://127.0.0.1:5984"

@@ -3,6 +3,7 @@ package clients
 import (
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 
@@ -59,6 +60,31 @@ func (c CouchDBClient) CreateTable(table string) error {
 	return nil
 }
 
-func (c CouchDBClient) AddDocument(tableName, data any) error {
+func (c CouchDBClient) AddDocument(table string, data io.Reader) error {
+	client := &http.Client{}
+
+	requestURI := fmt.Sprintf("%s/%s", c.addr, table)
+	log.Info("AddDocument - Request URI: ", requestURI)
+
+	req, err := http.NewRequest(http.MethodPost, requestURI, data)
+	if err != nil {
+		return err
+	}
+	req.SetBasicAuth(c.user, c.password)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusAccepted {
+		bodyContent := "N/A"
+		if body, err := ioutil.ReadAll(resp.Body); err != nil {
+			bodyContent = string(body)
+		}
+		return errors.New(fmt.Sprintf("AddDocument failed with status %d - %s", resp.StatusCode, bodyContent))
+	}
+
 	return nil
 }

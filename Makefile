@@ -12,7 +12,7 @@ init_couchdb:
 	curl -X PUT -H "Authorization:Basic YWRtaW46cGFzc3dvcmQ=" http://127.0.0.1:5984/_global_changes
 
 test:
-	go test ./...
+	go test ./... -count=1
 
 lint:
 	golangci-lint run
