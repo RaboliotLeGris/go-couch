@@ -35,13 +35,14 @@ func (d PostDocuments) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, document := range documents.Items {
-		dbDocument := dbmodels.DocumentFromAPI(document)
+	documentsDB := make([]dbmodels.Document, len(documents.Items))
+	for i, document := range documents.Items {
+		documentsDB[i] = dbmodels.DocumentFromAPI(document)
+	}
 
-		if err := d.CouchDBClient.AddDocument(tableName, dbDocument); err != nil {
-			http.Error(w, fmt.Sprintf("Post Documents - Unable to create the document - %s", err), http.StatusInternalServerError)
-			return
-		}
+	if err := d.CouchDBClient.AddDocumentBulk(tableName, documentsDB); err != nil {
+		http.Error(w, fmt.Sprintf("Post Documents - Unable to create the document - %s", err), http.StatusInternalServerError)
+		return
 	}
 }
 
