@@ -1,6 +1,7 @@
 package clients_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -47,4 +48,22 @@ func Test_Create_Document(t *testing.T) {
 
 	require.NoError(t, couchClient.AddDocument(tableName, document1))
 	require.NoError(t, couchClient.AddDocument(tableName, document2))
+}
+
+func Test_Create_Document_Bulk(t *testing.T) {
+	couchClient := clients.NewCouchDBClient("http://127.0.0.1:5984", "admin", "password")
+	tableName := "test_table_bulk"
+
+	_ = couchClient.CreateTable(tableName)
+
+	docs := []dbmodels.Document{}
+	for i := 0; i < 201; i++ { // 2 bulk + 1
+		docs = append(docs, dbmodels.Document{
+			Title:   fmt.Sprintf("title %d", i),
+			Content: fmt.Sprintf("content %d", i),
+			Author:  fmt.Sprintf("author %d", i),
+		})
+	}
+
+	require.NoError(t, couchClient.AddDocumentBulk(tableName, docs))
 }

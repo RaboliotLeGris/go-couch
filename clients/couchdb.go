@@ -95,3 +95,44 @@ func (c CouchDBClient) AddDocument(table string, document dbmodels.Document) err
 
 	return nil
 }
+
+type addDocumentBulk struct {
+	Docs []dbmodels.Document `json:"docs"`
+}
+
+func (c CouchDBClient) AddDocumentBulk(table string, docs []dbmodels.Document) error {
+	client := &http.Client{}
+
+	requestURI := fmt.Sprintf("%s/%s/_bulk_docs", c.addr, table)
+	log.Info("AddDocumentBulk - Request URI: ", requestURI)
+
+	bulkToInsert := addDocumentBulk{
+		Docs: docs,
+	}
+	encodedBulk, err := json.Marshal(bulkToInsert)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, requestURI, bytes.NewReader(encodedBulk))
+	if err != nil {
+		return err
+	}
+	req.SetBasicAuth(c.user, c.password)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != 201 {
+		bodyContent := "N/A"
+		if body, err := ioutil.ReadAll(resp.Body); err != nil {
+			bodyContent = string(body)
+		}
+		return errors.New(fmt.Sprintf("AddDocumentBulk failed with status %d - %s", resp.StatusCode, bodyContent))
+	}
+
+	return nil
+}
