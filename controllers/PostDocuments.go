@@ -7,9 +7,11 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/RaboliotLeGris/go-couch/apimodels"
+	"github.com/RaboliotLeGris/go-couch/clients"
 )
 
 type PostDocuments struct {
+	CouchDBClient clients.CouchDBClient
 }
 
 func (d PostDocuments) ServeHTTP(w http.ResponseWriter, r *http.Request) {

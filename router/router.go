@@ -7,16 +7,17 @@ import (
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/RaboliotLeGris/go-couch/clients"
 	"github.com/RaboliotLeGris/go-couch/controllers"
 )
 
-func Create_router() *mux.Router {
+func Create_router(couchDBClient clients.CouchDBClient) *mux.Router {
 	log.Info("Creating routers")
 	rootHandler := mux.NewRouter()
 
 	v1 := rootHandler.PathPrefix("/api/v1").Subrouter()
 
-	v1.PathPrefix("/documents").Handler(controllers.PostDocuments{}).Methods("POST")
+	v1.PathPrefix("/documents").Handler(controllers.PostDocuments{CouchDBClient: couchDBClient}).Methods("POST")
 
 	return rootHandler
 }

@@ -3,17 +3,23 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 
+	"github.com/RaboliotLeGris/go-couch/clients"
 	"github.com/RaboliotLeGris/go-couch/router"
 )
 
 func main() {
 	log.Info("Starting http server")
 
-	defaultPort := 7777
+	port := 7777
+	couchAddr := "http://127.0.0.1:5984"
+	couchUser := "admin"
+	couchPassword := "password"
 
-	r := router.Create_router()
+	couchDBClient := clients.NewCouchDBClient(couchAddr, couchUser, couchPassword)
 
-	if err := router.LaunchServer(r, defaultPort); err != nil {
+	r := router.Create_router(couchDBClient)
+
+	if err := router.LaunchServer(r, port); err != nil {
 		log.Error("Server stopped with error:", err)
 	}
 }
