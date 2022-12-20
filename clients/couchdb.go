@@ -101,6 +101,10 @@ type addDocumentBulk struct {
 }
 
 func (c CouchDBClient) AddDocumentBulk(table string, docs []dbmodels.Document) error {
+	if len(docs) == 0 {
+		return errors.New("empty list of docs to add")
+	}
+
 	client := &http.Client{}
 
 	requestURI := fmt.Sprintf("%s/%s/_bulk_docs", c.addr, table)
