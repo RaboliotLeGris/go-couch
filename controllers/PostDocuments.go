@@ -2,8 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/RaboliotLeGris/go-couch/apimodels"
@@ -24,4 +26,10 @@ func (d PostDocuments) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Debug("List of documents received", documents)
+	tableName := uuid.New().String()
+
+	if err := d.CouchDBClient.CreateTable(tableName); err != nil {
+		http.Error(w, fmt.Sprintf("Post Documents - Error while CreateTable - %s", err), http.StatusInternalServerError)
+		return
+	}
 }
