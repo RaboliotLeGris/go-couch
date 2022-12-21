@@ -7,8 +7,9 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/RaboliotLeGris/go-couch/dbmodels"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/RaboliotLeGris/go-couch/dbmodels"
 )
 
 type CouchDBClient struct {
