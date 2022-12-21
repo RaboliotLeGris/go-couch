@@ -2,11 +2,13 @@ package main
 
 import (
 	"math/rand"
+	"os"
 	"time"
 
 	log "github.com/sirupsen/logrus"
 
 	"github.com/RaboliotLeGris/go-couch/clients"
+	"github.com/RaboliotLeGris/go-couch/config"
 	"github.com/RaboliotLeGris/go-couch/router"
 )
 
@@ -16,16 +18,17 @@ func main() {
 	// Seed random with time
 	rand.Seed(time.Now().UnixNano())
 
-	port := 7777
-	couchAddr := "http://127.0.0.1:5984"
-	couchUser := "admin"
-	couchPassword := "password"
+	cfg, err := config.NewConfig()
+	if err != nil {
+		log.Error("Unable to parse config, exiting")
+		os.Exit(1)
+	}
 
-	couchDBClient := clients.NewCouchDBClient(couchAddr, couchUser, couchPassword)
+	couchDBClient := clients.NewCouchDBClient(cfg.CouchDbAddr, cfg.CouchDBUser, cfg.CouchDBPassword)
 
 	r := router.Create_router(couchDBClient)
 
-	if err := router.LaunchServer(r, port); err != nil {
+	if err := router.LaunchServer(r, cfg.Port); err != nil {
 		log.Error("Server stopped with error:", err)
 	}
 }
