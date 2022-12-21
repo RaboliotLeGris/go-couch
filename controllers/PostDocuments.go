@@ -40,7 +40,7 @@ func (d PostDocuments) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		documentsDB[i] = dbmodels.DocumentFromAPI(document)
 	}
 
-	if err := d.CouchDBClient.AddDocumentBulk(tableName, documentsDB); err != nil {
+	if err := d.CouchDBClient.AddDocumentsBulk(tableName, documentsDB); err != nil {
 		http.Error(w, fmt.Sprintf("Post Documents - Unable to create the document - %s", err), http.StatusInternalServerError)
 		return
 	}

@@ -1,5 +1,13 @@
 # go-couch
 
+I cut a few corners to do the test in an acceptable time.
+
+* On the performance side, it shouldn't be that great due to a lot of mapping between models.
+* As said in the code, the bulk processing is not that great since the user will get an answer before it's effectively in the DB
+* We should use context when possible
+* Add Graceful shutdown of the worker with the router API could also be nice
+* We should add a CI
+
 ## Required
 * Go - 1.19
 * Docker
